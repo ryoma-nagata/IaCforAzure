@@ -1,0 +1,133 @@
+name: IaC Deployment
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - infra/*
+      - code/*
+      - .ado/workflows/azure-pipelines.yml
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - infra/*
+      - code/*
+      - .ado/workflows/azure-pipelines.yml
+
+variables:
+  - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
+    value: "azure-devops-service-connection" # Update to '{yourResourceManagerConnectionName}'
+  - group: demo-vg
+
+
+stages:
+  - stage: Validation
+    displayName: "Validation of IaC templates"
+    jobs:
+      - job: Validation
+        displayName: "Validation of IaC templates"
+        continueOnError: false
+        pool:
+          vmImage: "ubuntu-latest"
+
+        steps:
+          # Checkout code
+          - checkout: self
+            name: checkout_repository
+            displayName: Checkout repository
+            submodules: true
+            lfs: false
+            clean: true
+            continueOnError: false
+            enabled: true
+
+          # Deploy ARM - validation
+          - task: AzureResourceManagerTemplateDeployment@3
+            name: ARM_validation
+            displayName: ARM - validation
+            enabled: true
+            continueOnError: false
+            inputs:
+              deploymentScope: "Subscription"
+              azureResourceManagerConnection: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
+              location: $(AZURE_LOCATION)
+              templateLocation: "Linked artifact"
+              csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
+              csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_demo.json"
+              deploymentMode: "Validation"
+
+          # Deploy ARM - what-if
+          - task: AzureCLI@2
+            name: ARM_whatif
+            displayName: Deploy ARM - what-if
+            enabled: true
+            continueOnError: false
+            inputs:
+              azureSubscription: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                az account set `
+                  --subscription $(AZURE_SUBSCRIPTION_ID)
+                
+                az deployment sub what-if `
+                  --location $(AZURE_LOCATION) `
+                  --subscription $(AZURE_SUBSCRIPTION_ID) `
+                  --exclude-change-types Ignore NoChange Unsupported `
+                  --template-file "$(System.DefaultWorkingDirectory)/infra/main.json" `
+                  --parameters "$(System.DefaultWorkingDirectory)/infra/params_demo.json" `
+                  --result-format "FullResourcePayloads"
+                
+              powerShellErrorActionPreference: "stop"
+              addSpnToEnvironment: false
+              useGlobalConfig: false
+              failOnStandardError: false
+              powerShellIgnoreLASTEXITCODE: false
+
+
+  - stage: Deployment
+    displayName: "Deployment of IaC templates"
+    dependsOn: Validation
+    # condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+    jobs:
+      - job: Deployment
+        displayName: "Deployment of IaC templates"
+        continueOnError: false
+        pool:
+          vmImage: "windows-latest"
+
+        steps:
+          # Checkout repository
+          - checkout: self
+            name: checkout_repository
+            displayName: "Checkout repository"
+            submodules: true
+            lfs: false
+            clean: true
+            continueOnError: false
+            enabled: true
+
+          # Deploy ARM
+          - task: AzureResourceManagerTemplateDeployment@3
+            name: iot_dashboard_deployment
+            displayName: IoT Dashboard Lambda
+            enabled: true
+            continueOnError: false
+            inputs:
+              deploymentScope: "Subscription"
+              azureResourceManagerConnection: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
+              subscriptionId: $(AZURE_SUBSCRIPTION_ID)
+              location: $(AZURE_LOCATION)
+              templateLocation: "Linked artifact"
+              csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
+              csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_demo.json"
+              deploymentMode: "Incremental"
+              deploymentOutputs: 'armOutputs'
+
+          - script: echo $(armOutputs)
+            displayName: 'Log armOutputs'
