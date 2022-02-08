@@ -4,7 +4,7 @@ targetScope = 'subscription'
 // general params
 param location string ='japaneast' 
 
-param project string = 'iot'
+param project string = ''
 @allowed([
   'demo'
   'poc'
@@ -16,7 +16,7 @@ param env string ='demo'
 param deployment_id string ='001'
 param userId string 
 
-var uniqueName = '${project}-pi${deployment_id}'
+var uniqueName = '${project}-${deployment_id}'
 
 var tags = {
   Environment : env
