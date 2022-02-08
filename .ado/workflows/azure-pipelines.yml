@@ -80,7 +80,7 @@ stages:
                   --subscription $(AZURE_SUBSCRIPTION_ID) `
                   --exclude-change-types Ignore NoChange Unsupported `
                   --template-file "$(System.DefaultWorkingDirectory)/infra/main.json" `
-                  --parameters "$(System.DefaultWorkingDirectory)/infra/params_demo.json" `
+                  --parameters "$(System.DefaultWorkingDirectory)/infra/params_dev.json" `
                   --result-format "FullResourcePayloads"
                 
               powerShellErrorActionPreference: "stop"
@@ -114,8 +114,8 @@ stages:
 
           # Deploy ARM
           - task: AzureResourceManagerTemplateDeployment@3
-            name: iot_dashboard_deployment
-            displayName: IoT Dashboard Lambda
+            name: ARM_deployment
+            displayName: ARM Deployment
             enabled: true
             continueOnError: false
             inputs:
