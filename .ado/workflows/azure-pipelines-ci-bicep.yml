@@ -20,9 +20,9 @@ variables:
   - name: AZURE_LOCATION
     value: "japaneast" # Update to '{yourResourceManagerConnectionName}'
   - name: AZURE_SUBSCRIPTION_ID
-    value: "b8fcef3b-27f8-4860-8f4b-9e8e860bd93d" # Update to '{yourResourceManagerConnectionName}'
+    value: "" # Update to '{yourResourceManagerConnectionName}'
   - name: RESOURCE_GROUP_NAME
-    value: "BAP-NGT-RICOH-DMPF-ZEAL" # Update to '{yourResourceManagerConnectionName}'
+    value: "" # Update to '{yourResourceManagerConnectionName}'
 
 
 stages:
@@ -71,7 +71,7 @@ stages:
               resourceGroupName: $(RESOURCE_GROUP_NAME)
               location: $(AZURE_LOCATION)
               templateLocation: "Linked artifact"
-              csmFile: "$(build.artifactstagingdirectory)/infra/deployRG.json"
+              csmFile: "$(build.artifactstagingdirectory)/infra/deploy.json"
               csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_dev.json"
               deploymentMode: "Validation"
 
@@ -93,7 +93,7 @@ stages:
                   --location $(AZURE_LOCATION) `
                   --subscription $(AZURE_SUBSCRIPTION_ID) `
                   --exclude-change-types Ignore NoChange Unsupported `
-                  --template-file "$(System.DefaultWorkingDirectory)/infra/main.json" `
+                  --template-file "$(build.artifactstagingdirectory)/infra/deploy.json"`
                   --parameters "$(System.DefaultWorkingDirectory)/infra/params_dev.json" `
                   --result-format "FullResourcePayloads"
 
