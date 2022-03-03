@@ -3,26 +3,25 @@ name: IaC Deployment
 trigger:
   branches:
     include:
-      - main
+      - 'main'
+      - 'release/*'
   paths:
     include:
       - infra/*
       - code/*
       - .ado/workflows/azure-pipelines.yml
 pr:
-  branches:
-    include:
-      - main
-  paths:
-    include:
-      - infra/*
-      - code/*
-      - .ado/workflows/azure-pipelines.yml
+  none
 
 variables:
   - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
     value: "azure-devops-service-connection" # Update to '{yourResourceManagerConnectionName}'
-  - group: demo-vg
+  - name: AZURE_LOCATION
+    value: "japaneast" # Update to '{yourAZURE_LOCATION}'
+  - name: AZURE_SUBSCRIPTION_ID
+    value: "" # Update to '{yourAZURE_SUBSCRIPTION_ID}'
+  - name: RESOURCE_GROUP_NAME
+    value: "" # Update to '{yourRESOURCE_GROUP_NAME}'
 
 
 stages:
@@ -125,7 +124,7 @@ stages:
               location: $(AZURE_LOCATION)
               templateLocation: "Linked artifact"
               csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
-              csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_demo.json"
+              csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_dev.json"
               deploymentMode: "Incremental"
               deploymentOutputs: 'armOutputs'
 
