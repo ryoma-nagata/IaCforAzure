@@ -64,7 +64,21 @@ stages:
           #         exit 1
           #     fi
           #   displayName: 'Check source branch'
-
+          
+          # # Generate Password
+          # - task: PowerShell@2
+          #   name: generate_password_001
+          #   displayName: Generate Password
+          #   enabled: true
+          #   continueOnError: false
+          #   inputs:
+          #     targetType: 'filePath'
+          #     filePath: '$(System.DefaultWorkingDirectory)/code/GeneratePassword.ps1'
+          #     errorActionPreference: 'stop'
+          #     failOnStderr: false
+          #     ignoreLASTEXITCODE: false
+          #     pwsh: true
+          
           # building bicep into ARM
           - task: AzureCLI@2  
             displayName: 'Build bicep artifact' 
@@ -180,7 +194,9 @@ stages:
               #     csmParametersFile: "$(Pipeline.Workspace)/infra/params_stg.json"
               #     deploymentMode: "Incremental"
               #     deploymentOutputs: 'armOutputs'
-
+              # overrideParameters: >
+              #   -administratorPassword "$(password)"
+              
               # リソースグループスコープの場合
               # Deploy ARM - validation
               - task: AzureResourceManagerTemplateDeployment@3
@@ -199,7 +215,9 @@ stages:
                   csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_stg.json"
                   deploymentMode: "Incremental"
                   deploymentOutputs: 'armOutputs'
-                  
+              # overrideParameters: >
+              #   -administratorPassword "$(password)"
+              
               - script: echo $(armOutputs)
                 displayName: 'Log armOutputs'
 
