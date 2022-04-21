@@ -63,6 +63,20 @@ stages:
           #         echo 'Please PR to correct branch'
           #     fi
           #   displayName: 'Check source branch'
+          
+          # # Generate Password
+          # - task: PowerShell@2
+          #   name: generate_password_001
+          #   displayName: Generate Password
+          #   enabled: true
+          #   continueOnError: false
+          #   inputs:
+          #     targetType: 'filePath'
+          #     filePath: '$(System.DefaultWorkingDirectory)/code/GeneratePassword.ps1'
+          #     errorActionPreference: 'stop'
+          #     failOnStderr: false
+          #     ignoreLASTEXITCODE: false
+          #     pwsh: true
             
           # building bicep into ARM
           - task: AzureCLI@2  
@@ -91,7 +105,8 @@ stages:
           #     csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
           #     csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_stg.json"
           #     deploymentMode: "Validation"
-
+              # overrideParameters: >
+              #   -administratorPassword "$(password)"
           # リソースグループスコープの場合
           # Deploy ARM - validation
           - task: AzureResourceManagerTemplateDeployment@3
@@ -109,3 +124,5 @@ stages:
               csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
               csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_stg.json"
               deploymentMode: "Validation"
+              # overrideParameters: >
+              #   -administratorPassword "$(password)"
