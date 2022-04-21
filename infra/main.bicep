@@ -16,11 +16,11 @@ param env string ='demo'
 param deployment_id string ='001'
 param userId string 
 
-var uniqueName = '${project}-${deployment_id}'
+var prefix = '${project}-${deployment_id}'
 
 var tags = {
   Environment : env
   Project : project
 }
 
-var rg_name = '${uniqueName}---${env}'
+var rg_name = '${prefix}---${env}'
