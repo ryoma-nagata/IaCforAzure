@@ -92,7 +92,7 @@ stages:
                 az bicep build --file $file --outdir $(System.DefaultWorkingDirectory)/infra
 
           # # サブスクリプションスコープの場合
-          # # Deploy dev - what-if
+          # # Deploy  - what-if
           # - task: AzureCLI@2
           #   name: ARM_whatif
           #   displayName: Deploy ARM - what-if
@@ -106,14 +106,13 @@ stages:
           #       az account set `
           #         --subscription $(AZURE_SUBSCRIPTION_ID)
                 
-          #       az deployment group what-if `
+          #       az deployment sub what-if `
           #         --location $(AZURE_LOCATION) `
           #         --subscription $(AZURE_SUBSCRIPTION_ID) `
           #         --exclude-change-types Ignore NoChange Unsupported `
           #         --template-file "$(System.DefaultWorkingDirectory)/infra/main.json" `
           #         --parameters "$(System.DefaultWorkingDirectory)/infra/params_stg.json" `
           #         --result-format "FullResourcePayloads"
-                
           #     powerShellErrorActionPreference: "stop"
           #     addSpnToEnvironment: false
           #     useGlobalConfig: false
@@ -121,9 +120,9 @@ stages:
           #     powerShellIgnoreLASTEXITCODE: false
 
           # リソースグループスコープの場合  
-          # Deploy ARM - what-if
+          # Deploy - what-if
           - task: AzureCLI@2
-            name: ARM_whatif_TRAINER
+            name: ARM_whatif
             displayName: Deploy ARM TRAINER - what-if
             enabled: true
             continueOnError: false
@@ -198,9 +197,9 @@ stages:
               #   -administratorPassword "$(password)"
               
               # リソースグループスコープの場合
-              # Deploy ARM - validation
+              # Deploy ARM 
               - task: AzureResourceManagerTemplateDeployment@3
-                name: ARM_valARM_deploymentidation
+                name: ARM_deployment
                 displayName: ARM Deployment
                 enabled: true
                 continueOnError: false
