@@ -210,8 +210,8 @@ stages:
                   resourceGroupName: $(RESOURCE_GROUP_NAME)
                   location: $(AZURE_LOCATION)
                   templateLocation: "Linked artifact"
-                  csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
-                  csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_stg.json"
+                  csmFile: "$(Pipeline.Workspace)/infra/main.json"
+                  csmParametersFile: "$(Pipeline.Workspace)/infra/params_stg.json"
                   deploymentMode: "Incremental"
                   deploymentOutputs: 'armOutputs'
               # overrideParameters: >
