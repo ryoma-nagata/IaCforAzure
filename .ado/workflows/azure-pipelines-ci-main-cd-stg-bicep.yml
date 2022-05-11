@@ -123,7 +123,7 @@ stages:
           # Deploy - what-if
           - task: AzureCLI@2
             name: ARM_whatif
-            displayName: Deploy ARM TRAINER - what-if
+            displayName: Deploy ARM - what-if
             enabled: true
             continueOnError: false
             inputs:
