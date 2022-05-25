@@ -1,12 +1,11 @@
-$targetRG=''
-$subscriptionId=''
+
 
 az login
 
-az account set --subscription $subscriptionId
+az account set --subscription $SUBSCRIPTION_ID
 
 # resourceGroup
-az deployment group create --resource-group $targetRG --template-file infra/main.bicep --parameters @infra/params_dev.json
+az deployment group create --resource-group $TARGET_RESOURCE_GROUP --template-file infra/main.bicep --parameters @infra/params_dev.json
 
 # sub
 

@@ -4,6 +4,7 @@ trigger:
   none
   #   exclude:
   #     - 'main'
+  #     - 'master'
   #     - 'release/*'
 
   # paths:
