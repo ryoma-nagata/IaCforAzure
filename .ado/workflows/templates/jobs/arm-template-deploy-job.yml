@@ -2,13 +2,11 @@
 parameters:
 - name: ENVIRONMENT_NAME
   type: string
-- name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
+- name: TARGET_AZURE_SUBSCRIPTION_ID
   type: string
-- name: AZURE_SUBSCRIPTION_ID
+- name: TARGET_RESOURCE_GROUP_NAME
   type: string
-- name: RESOURCE_GROUP_NAME
-  type: string
-- name: AZURE_LOCATION
+- name: TARGET_AZURE_LOCATION
   type: string
 - name: PARAMETER_FILEPATH
   type: string
@@ -35,9 +33,9 @@ jobs:
             inputs:
               deploymentScope: "ResouceGroup"
               ConnectedServiceName: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
-              subscriptionId: $(AZURE_SUBSCRIPTION_ID) 
-              resourceGroupName: $(RESOURCE_GROUP_NAME)
-              location: $(AZURE_LOCATION)
+              subscriptionId: ${{ parameters.TARGET_AZURE_SUBSCRIPTION_ID }}
+              resourceGroupName: ${{ parameters.TARGET_RESOURCE_GROUP_NAME }}
+              location: ${{ parameters.TARGET_AZURE_LOCATION }}
               templateLocation: "Linked artifact"
               csmFile: "$(Pipeline.Workspace)/${{ parameters.DEPLOY_FILEPATH }}"
               csmParametersFile: "$(Pipeline.Workspace)/${{ parameters.PARAMETER_FILEPATH }}"
