@@ -1,26 +1,44 @@
 
 targetScope = 'subscription'
+//targetScope = 'resourceGroup'
 
-// general params
-param location string ='japaneast' 
+// general 
+@description('リソースのデプロイリージョン')
+@allowed([
+  'southcentralus'
+  'southeastasia'
+  'japaneast'
+])
+param location string = 'japaneast'
 
-param project string = ''
+@minLength(3)
+@maxLength(7)
+@description('リソース名はproject-deployment_id-リソース種類-envとなります')
+param project string 
 @allowed([
   'demo'
   'poc'
   'dev'
   'test'
   'prod'
+  'stg'
 ])
-param env string ='demo'
-param deployment_id string ='001'
-param userId string 
+@description('リソース名はproject-deployment_id-リソース種類-envとなります')
+param env string 
+@description('リソース名はproject-deployment_id-リソース種類-envとなります')
+@maxLength(2)
+param deployment_id string = '01'
 
-var prefix = '${project}-${deployment_id}'
+var prefix  = toLower('${project}-${deployment_id}')
+
+@description('セキュリティグループの名称を入力すると自動で権限が付与されます')
+param adminSecurityGroupName string = ''
+@description('セキュリティグループのプリンシパルIDを入力すると自動で権限が付与されます')
+param adminSecurityGroupObjectId string = ''
 
 var tags = {
   Environment : env
   Project : project
+  Deployment_id : deployment_id
+  DeployMethod : 'bicep'
 }
-
-var rg_name = '${prefix}---${env}'
