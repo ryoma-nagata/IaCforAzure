@@ -10,8 +10,12 @@ parameters:
   type: string
 - name: AZURE_LOCATION
   type: string
-- name: PARAMETER_FILENAME
+- name: PARAMETER_FILEPATH
   type: string
+- name: DEPLOY_FILEPATH
+  type: string
+
+
 
 jobs:
 - deployment: deploy_ARM
@@ -35,7 +39,7 @@ jobs:
               resourceGroupName: $(RESOURCE_GROUP_NAME)
               location: $(AZURE_LOCATION)
               templateLocation: "Linked artifact"
-              csmFile: "$(Pipeline.Workspace)/infra/main.json"
-              csmParametersFile: "$(Pipeline.Workspace)/infra/${{ parameters.PARAMETER_FILENAME }}"
+              csmFile: "$(Pipeline.Workspace)/${{ parameters.DEPLOY_FILEPATH }}"
+              csmParametersFile: "$(Pipeline.Workspace)/${{ parameters.PARAMETER_FILEPATH }}"
               deploymentMode: "Incremental"
               deploymentOutputs: 'armOutputs'
