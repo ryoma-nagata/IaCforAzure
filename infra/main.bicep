@@ -22,6 +22,7 @@ param project string
   'test'
   'prod'
   'stg'
+  'sand'
 ])
 @description('リソース名はproject-deployment_id-リソース種類-envとなります')
 param env string 
