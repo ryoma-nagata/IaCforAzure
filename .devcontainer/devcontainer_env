@@ -1,0 +1,8 @@
+###
+# 環境変数設定
+#
+# 
+AZURE_SUBSCRIPTION_ID=
+
+TARGET_RESOURCE_GROUP=
+
