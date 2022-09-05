@@ -17,7 +17,7 @@ pr: none
 resources:
   pipelines:
   - pipeline: ciartifacts
-    source: iac-data-landing-ci-cd-dev  # ci用のPipeline名に修正する
+    source: arm-template-ci-dev  # ci用のPipeline名に修正する
 
 variables:
   - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME

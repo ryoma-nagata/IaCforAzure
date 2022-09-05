@@ -2,5 +2,5 @@
 
 ## 使い方
 
-[クイックスタート](docs/QuickStart.md)を参照してください。
+[クイックスタート](docs/quick-start.md.md)を参照してください。
 

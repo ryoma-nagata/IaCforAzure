@@ -5,8 +5,8 @@ trigger:
   branches:
     include:
       - 'main'
-      - 'master'
-      - 'release*'
+      # - 'master'
+      # - 'release*'
   paths:
     include:
       - infra/*
@@ -15,7 +15,7 @@ trigger:
 resources:
   pipelines:
   - pipeline: ciartifacts
-    source: iac-data-landing-ci-cd-dev  # ci用のPipeline名に修正する
+    source: arm-template-ci-dev  # ci用のPipeline名に修正する
 
 pr: none  
 # PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers

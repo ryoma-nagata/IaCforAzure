@@ -1,4 +1,4 @@
-name: arm-template-ci-cd-dev-$(rev:r)
+name: arm-template-ci-dev-$(rev:r)
 
 trigger:
   # none
@@ -55,7 +55,7 @@ stages:
     dependsOn: Build
     # condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
     jobs:
-    - template: templates/jobs/arm-template-deploy-job.yml
+    - template: templates/jobs/arm-template-rg-deploy-job.yml
       parameters:
         ENVIRONMENT_NAME: 'dev'
         TARGET_AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)

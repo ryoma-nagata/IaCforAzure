@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "location": {
-        "value": ""
+        "value": "japaneast"
       },
       "project": {
-        "value": ""
+        "value": "ngt"
       },
       "env": {
-        "value": ""
+        "value": "sand"
       },
       "deployment_id": {
-        "value": ""
+        "value": "01"
       }
     }
 }

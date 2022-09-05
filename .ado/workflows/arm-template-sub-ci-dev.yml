@@ -1,4 +1,4 @@
-name: arm-template-ci-cd-dev-$(rev:r)
+name: arm-template-ci-dev-$(rev:r)
 
 trigger:
   # none
