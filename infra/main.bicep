@@ -1,6 +1,6 @@
 
-targetScope = 'subscription'
-//targetScope = 'resourceGroup'
+// targetScope = 'subscription'
+targetScope = 'resourceGroup'
 
 // general 
 @description('リソースのデプロイリージョン')
@@ -32,14 +32,20 @@ param deployment_id string = '01'
 
 var prefix  = toLower('${project}-${deployment_id}')
 
-@description('セキュリティグループの名称を入力すると自動で権限が付与されます')
-param adminSecurityGroupName string = ''
-@description('セキュリティグループのプリンシパルIDを入力すると自動で権限が付与されます')
-param adminSecurityGroupObjectId string = ''
 
 var tags = {
   Environment : env
   Project : project
   Deployment_id : deployment_id
   DeployMethod : 'bicep'
+}
+
+module datalakes 'modules/datalakes.bicep' = {
+  name: 'datalakes'
+  params: {
+    env: env
+    tags: union(tags ,{Module : 'datalakes'})
+    prefix: prefix
+    location: location
+  }
 }
