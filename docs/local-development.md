@@ -14,7 +14,7 @@
 （参考） [WSL 開発環境を設定するためのベスト プラクティス](https://docs.microsoft.com/ja-jp/windows/wsl/setup/environment) 
 
 
-## (option) 2. devcontainerからサンドボックスのデプロイ
+## (option) devcontainerからサンドボックスのデプロイ
 
 1. Remote containerを開く前に、devcontainer.envファイルを作成し、環境変数を設定します。このファイルはgitには反映されません。変更したらremote container を実行します。
 
