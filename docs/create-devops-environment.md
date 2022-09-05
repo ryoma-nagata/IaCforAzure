@@ -6,15 +6,15 @@
 
 ## 2. Repositryのインポート
 
-1. **Repos**->**Files**->**Import repository**の順にクリックします
+1. **Repos** -> **Files** -> **Import repository** の順にクリックします
 
 ![](.image/2022-09-05-09-46-47.png)
 
-2. **https://github.com/ryoma-nagata/IaCforAzure.git**を入力して、適宜名称を変更して**Import**をクリックします。
+2. **https://github.com/ryoma-nagata/IaCforAzure.git** を入力して、適宜名称を変更して **Import** をクリックします。
 
 ![](.image/2022-09-05-09-48-17.png)
 
-3. リポジトリがインポートされていることを確認します。
+1. リポジトリがインポートされていることを確認します。
 
 ![](.image/2022-09-05-09-49-17.png)
 
@@ -33,33 +33,31 @@
 ![](.image/2022-09-05-09-53-29.png)
 
 
-
-
 ## 4. サービス接続の作成
 
-1. **Project setting**に移動します。
+1. **Project setting** に移動します。
 
 ![](.image/2022-02-15-13-57-03.png)
 
-2. **Service connections**->**Create service connection**の順にクリックします。
+2. **Service connections**->**Create service connection** の順にクリックします。
 
 [参考](https://docs.microsoft.com/ja-jp/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection)
 
 ![](.image/2022-02-15-14-00-23.png)
 
-3. **Azure Resource Manager**を選択します。
+3. **Azure Resource Manager** を選択します。
 
 ![](.image/2022-02-15-14-01-10.png)
 
-4. **Service principal(manual)**を選択します。
+4. **Service principal(manual)** を選択します。
 
 ![](.image/2022-02-15-14-01-39.png)
 
-5. 各項目を入力のうえ、**name**には**azure-devops-service-connection**と入力します。
+5. 各項目を入力のうえ、 **name** には **azure-devops-service-connection** と入力します。
 
 ![](.image/2022-02-15-14-04-03.png)
 
-6. **Grant access permission to all pipelines**にチェックをつけて**Verify and save**をクリックします。
+6. **Grant access permission to all pipelines** にチェックをつけて **Verify and save** をクリックします。
 
 ![](.image/2022-02-15-14-04-43.png)
 
@@ -86,7 +84,7 @@
 
 ###  (option) デプロイ承認ゲートの追加
 
-1. **・・・**->**Approvals and checks** をクリックします。
+1. **・・・** -> **Approvals and checks** をクリックします。
 
 ![](.image/2022-09-05-09-58-30.png)
 
@@ -98,3 +96,7 @@
 
 ![](.image/2022-09-05-09-59-52.png)
 
+
+## 次のステップ
+
+[パイプラインの構成と初回実行](run-pipeline.md)
