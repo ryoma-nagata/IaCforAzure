@@ -1,28 +1,9 @@
 name: arm-template-ci-qa-$(rev:r)
 
 trigger: none  
-
-  #   exclude:
-  #     - 'main'
-  #     - 'master'
-  #     - 'release/*'
-
-  # paths:
-  #   include:
-  #     - infra/*
-  #     - code/*
-
 pr: none  
-# pr: # PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
-  # branches:
-  #   include:
-  #     - 'main'
-  #     - 'release/*'
-  # paths:
-  #   include:
-  #     - infra/*
-  #     - code/*
-  #     - .ado/workflows/azure-pipelines-ci-qa-bicep.yml
+# PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
+
 
 variables:
   - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
@@ -31,8 +12,6 @@ variables:
     value: "japaneast" # Update to '{yourLocationName}'
   - name: AZURE_SUBSCRIPTION_ID
     value: "" # Update to '{yourAZURE_SUBSCRIPTION_ID}'
-  - name: RESOURCE_GROUP_NAME
-    value: "" # Update to '{yourRESOURCE_GROUP_NAME}'
 
 
 stages:
@@ -93,23 +72,6 @@ stages:
           #     pwsh: true
 
           # # サブスクリプションスコープの場合
-          # # Deploy ARM - validation
-          # - task: AzureResourceManagerTemplateDeployment@3
-          #   name: ARM_validation
-          #   displayName: ARM - validation
-          #   enabled: true
-          #   continueOnError: false
-          #   inputs:
-          #     deploymentScope: "Subscription"
-          #     azureResourceManagerConnection: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
-          #     location: $(AZURE_LOCATION)
-          #     templateLocation: "Linked artifact"
-          #     csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
-          #     csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_stg.json"
-          #     deploymentMode: "Validation"
-              # overrideParameters: >
-              #   -administratorPassword "$(password)"
-          # リソースグループスコープの場合
           # Deploy ARM - validation
           - task: AzureResourceManagerTemplateDeployment@3
             name: ARM_validation
@@ -117,10 +79,9 @@ stages:
             enabled: true
             continueOnError: false
             inputs:
-              deploymentScope: Resource Group
+              deploymentScope: "Subscription"
               ConnectedServiceName: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
               subscriptionId: $(AZURE_SUBSCRIPTION_ID) 
-              resourceGroupName: $(RESOURCE_GROUP_NAME)
               location: $(AZURE_LOCATION)
               templateLocation: "Linked artifact"
               csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
@@ -130,7 +91,7 @@ stages:
               #   -administratorPassword "$(password)"
 
 
-          # リソースグループスコープの場合  
+          # サブスクリプションスコープの場合 
           # what-if dev
           - task: AzureCLI@2
             name: ARM_whatif
@@ -145,8 +106,7 @@ stages:
                 az account set `
                   --subscription $(AZURE_SUBSCRIPTION_ID)
                 
-                az deployment group what-if `
-                  --resource-group $(RESOURCE_GROUP_NAME) `
+                az deployment sub what-if `
                   --subscription $(AZURE_SUBSCRIPTION_ID) `
                   --exclude-change-types Ignore NoChange Unsupported `
                   --template-file "$(System.DefaultWorkingDirectory)/infra/main.json" `

@@ -1,33 +1,15 @@
-name: build-bicep
+name: arm-template-ci-qa-$(rev:r)
 
-trigger:
-  none
-  #   exclude:
-  #     - 'main'
-  #     - 'master'
-  #     - 'release/*'
+trigger: none  
+pr: none  
+# PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
 
-  # paths:
-  #   include:
-  #     - infra/*
-  #     - code/*
-
-# pr: # PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
-  # branches:
-  #   include:
-  #     - 'main'
-  #     - 'release/*'
-  # paths:
-  #   include:
-  #     - infra/*
-  #     - code/*
-  #     - .ado/workflows/azure-pipelines-ci-qa-bicep.yml
 
 variables:
   - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
     value: "azure-devops-service-connection" # Update to '{yourResourceManagerConnectionName}'
   - name: AZURE_LOCATION
-    value: "" # Update to '{yourLocationName}'
+    value: "japaneast" # Update to '{yourLocationName}'
   - name: AZURE_SUBSCRIPTION_ID
     value: "" # Update to '{yourAZURE_SUBSCRIPTION_ID}'
   - name: RESOURCE_GROUP_NAME
@@ -36,14 +18,13 @@ variables:
 
 stages:
   - stage: CI
-    displayName: "Validation of bicep"
+    displayName: "ARM Template CI"
+    pool:
+      vmImage: "ubuntu-latest"
     jobs:
-      - job: UT_Bicep
-        displayName: "Validation of bicep"
-        continueOnError: false
-        pool:
-          vmImage: "ubuntu-latest"
-
+      - job: Validation
+        displayName: "Validation bicep"
+        continueOnError: false       
         steps:
           # Checkout code
           - checkout: self
@@ -64,7 +45,20 @@ stages:
           #         echo 'Please PR to correct branch'
           #     fi
           #   displayName: 'Check source branch'
-          
+
+
+          # building bicep into ARM
+          - task: AzureCLI@2  
+            displayName: 'Build bicep artifact' 
+            inputs: 
+              azureSubscription: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
+              scriptType: 'pscore'  
+              scriptLocation: 'inlineScript'  
+              inlineScript: |
+                $file = "$(System.DefaultWorkingDirectory)/infra/main.bicep"            
+                New-Item -ItemType Directory -Force -Path $(System.DefaultWorkingDirectory)/infra
+                az bicep build --file $file --outdir $(System.DefaultWorkingDirectory)/infra
+
           # # Generate Password
           # - task: PowerShell@2
           #   name: generate_password_001
@@ -78,52 +72,49 @@ stages:
           #     failOnStderr: false
           #     ignoreLASTEXITCODE: false
           #     pwsh: true
-            
-          # building bicep into ARM
-          - task: AzureCLI@2  
-            displayName: 'Build bicep artifact' 
-            inputs: 
-              azureSubscription: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
-              scriptType: 'pscore'  
-              scriptLocation: 'inlineScript'  
-              inlineScript: |
-                $file = "$(System.DefaultWorkingDirectory)/infra/main.bicep"            
-                New-Item -ItemType Directory -Force -Path $(System.DefaultWorkingDirectory)/infra
-                az bicep build --file $file --outdir $(System.DefaultWorkingDirectory)/infra
 
-          # # サブスクリプションスコープの場合
-          # # Deploy ARM - validation
-          # - task: AzureResourceManagerTemplateDeployment@3
-          #   name: ARM_validation
-          #   displayName: ARM - validation
-          #   enabled: true
-          #   continueOnError: false
-          #   inputs:
-          #     deploymentScope: "Subscription"
-          #     azureResourceManagerConnection: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
-          #     location: $(AZURE_LOCATION)
-          #     templateLocation: "Linked artifact"
-          #     csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
-          #     csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_stg.json"
-          #     deploymentMode: "Validation"
-              # overrideParameters: >
-              #   -administratorPassword "$(password)"
+
           # リソースグループスコープの場合
           # Deploy ARM - validation
           - task: AzureResourceManagerTemplateDeployment@3
             name: ARM_validation
-            displayName: ARM - validation
+            displayName: Validate ARM template
             enabled: true
             continueOnError: false
             inputs:
-              deploymentScope: "ResouceGroup"
+              deploymentScope: Resource Group
               ConnectedServiceName: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
               subscriptionId: $(AZURE_SUBSCRIPTION_ID) 
               resourceGroupName: $(RESOURCE_GROUP_NAME)
               location: $(AZURE_LOCATION)
               templateLocation: "Linked artifact"
               csmFile: "$(System.DefaultWorkingDirectory)/infra/main.json"
-              csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_stg.json"
+              csmParametersFile: "$(System.DefaultWorkingDirectory)/infra/params_dev.json"
               deploymentMode: "Validation"
               # overrideParameters: >
               #   -administratorPassword "$(password)"
+
+
+          # リソースグループスコープの場合  
+          # what-if dev
+          - task: AzureCLI@2
+            name: ARM_whatif
+            displayName: what-if dev
+            enabled: true
+            continueOnError: false
+            inputs:
+              azureSubscription: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                az account set `
+                  --subscription $(AZURE_SUBSCRIPTION_ID)
+                
+                az deployment group what-if `
+                  --resource-group $(RESOURCE_GROUP_NAME) `
+                  --subscription $(AZURE_SUBSCRIPTION_ID) `
+                  --exclude-change-types Ignore NoChange Unsupported `
+                  --template-file "$(System.DefaultWorkingDirectory)/infra/main.json" `
+                  --parameters "$(System.DefaultWorkingDirectory)/infra/params_dev.json" `
+                  --result-format "FullResourcePayloads"
+

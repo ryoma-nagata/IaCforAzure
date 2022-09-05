@@ -1,0 +1,63 @@
+name: arm-template-ci-cd-dev-$(rev:r)
+
+trigger:
+  # none
+  branches:
+    include:
+      - 'develop'
+  paths:
+    include:
+      - infra/*
+      - code/*
+pr: none  
+# PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
+
+variables:
+  - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
+    value: "azure-devops-service-connection" # Update to '{yourResourceManagerConnectionName}'
+  - name: AZURE_LOCATION
+    value: "japaneast" # Update to '{yourLocationName}'
+  - name: AZURE_SUBSCRIPTION_ID
+    value: "" # Update to '{yourAZURE_SUBSCRIPTION_ID}'
+
+stages:
+  - stage: Build
+    displayName: "Build ARM templates"
+    # condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+    jobs:
+      - job: Build
+        steps:
+      # building bicep into ARM
+          - task: AzureCLI@2  
+            displayName: 'Build bicep artifact' 
+            inputs: 
+              azureSubscription: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
+              scriptType: 'pscore'  
+              scriptLocation: 'inlineScript'  
+              inlineScript: |
+                $file = "$(System.DefaultWorkingDirectory)/infra/main.bicep"            
+                New-Item -ItemType Directory -Force -Path $(System.DefaultWorkingDirectory)/infra
+                az bicep build --file $file --outdir $(System.DefaultWorkingDirectory)/infra
+          - task: CopyFiles@2
+            displayName: 'Copy jsons'
+            inputs:
+              contents: '$(System.DefaultWorkingDirectory)/infra/**.json' 
+              targetFolder: '$(Build.ArtifactStagingDirectory)'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/infra'
+            displayName: 'Publish ARM template'
+            artifact: 'infra'
+
+  - stage: Deploy_dev
+    displayName: "Deploy ARM templates to dev"
+    dependsOn: Build
+    # condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+    jobs:
+    - template: templates/jobs/arm-template-sub-deploy-job.yml
+      parameters:
+        ENVIRONMENT_NAME: 'dev'
+        TARGET_AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        TARGET_AZURE_LOCATION: $(AZURE_LOCATION)
+        PARAMETER_FILEPATH: infra/params_dev.json
+        DEPLOY_FILEPATH: infra/main.json
+        

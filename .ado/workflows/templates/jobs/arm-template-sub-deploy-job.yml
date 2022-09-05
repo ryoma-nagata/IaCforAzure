@@ -1,0 +1,40 @@
+
+parameters:
+- name: ENVIRONMENT_NAME
+  type: string
+- name: TARGET_AZURE_SUBSCRIPTION_ID
+  type: string
+- name: TARGET_AZURE_LOCATION
+  type: string
+- name: PARAMETER_FILEPATH
+  type: string
+- name: DEPLOY_FILEPATH
+  type: string
+
+
+
+jobs:
+- deployment: deploy_ARM
+  displayName: 'Deploy using ARM Template'
+  pool:
+    vmImage: "windows-latest"
+  environment: ${{ parameters.ENVIRONMENT_NAME }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+          - task: AzureResourceManagerTemplateDeployment@3
+            name: ARM_deployment
+            displayName: ARM Deployment
+            enabled: true
+            continueOnError: false
+            inputs:
+              deploymentScope: "Subscription"
+              ConnectedServiceName: $(AZURE_RESOURCE_MANAGER_CONNECTION_NAME)
+              subscriptionId: ${{ parameters.TARGET_AZURE_SUBSCRIPTION_ID }}
+              location: ${{ parameters.TARGET_AZURE_LOCATION }}
+              templateLocation: "Linked artifact"
+              csmFile: "$(Pipeline.Workspace)/${{ parameters.DEPLOY_FILEPATH }}"
+              csmParametersFile: "$(Pipeline.Workspace)/${{ parameters.PARAMETER_FILEPATH }}"
+              deploymentMode: "Incremental"
+              deploymentOutputs: 'armOutputs'

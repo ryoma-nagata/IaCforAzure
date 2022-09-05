@@ -9,17 +9,9 @@ trigger:
     include:
       - infra/*
       - code/*
+pr: none  
+# PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
 
-# pr: # PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
-  # branches:
-  #   include:
-  #     - 'main'
-  #     - 'release/*'
-  # paths:
-  #   include:
-  #     - infra/*
-  #     - code/*
-  #     - .ado/workflows/azure-pipelines-ci-qa-bicep.yml
 variables:
   - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
     value: "azure-devops-service-connection" # Update to '{yourResourceManagerConnectionName}'

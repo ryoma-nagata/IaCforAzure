@@ -17,16 +17,9 @@ resources:
   - pipeline: ciartifacts
     source: iac-data-landing-ci-cd-dev  # ci用のPipeline名に修正する
 
-# pr: # PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
-  # branches:
-  #   include:
-  #     - 'main'
-  #     - 'release/*'
-  # paths:
-  #   include:
-  #     - infra/*
-  #     - code/*
-  #     - .ado/workflows/azure-pipelines-ci-qa-bicep.yml
+pr: none  
+# PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
+
 variables:
   - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
     value: "azure-devops-service-connection" # Update to '{yourResourceManagerConnectionName}'
@@ -42,7 +35,7 @@ stages:
     displayName: "Deploy ARM templates to dev"
     # condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
     jobs:
-    - template: templates/jobs/arm-template-deploy-job.yml
+    - template: templates/jobs/arm-template-rg-deploy-job.yml
       parameters:
         ENVIRONMENT_NAME: 'prod'
         TARGET_AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)

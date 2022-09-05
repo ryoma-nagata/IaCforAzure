@@ -1,0 +1,42 @@
+name: arm-template-cd-release-$(rev:r)
+
+trigger:
+  # none
+  branches:
+    include:
+      - 'main'
+      - 'master'
+      - 'release*'
+  paths:
+    include:
+      - infra/*
+      - code/*
+pr: none  
+# PRトリガーはAzure Reposの場合、branch policyで実装します。https://docs.microsoft.com/ja-jp/azure/devops/pipelines/repos/azure-repos-git?view=azure-devops&tabs=yaml#pr-triggers
+
+resources:
+  pipelines:
+  - pipeline: ciartifacts
+    source: iac-data-landing-ci-cd-dev  # ci用のPipeline名に修正する
+
+variables:
+  - name: AZURE_RESOURCE_MANAGER_CONNECTION_NAME
+    value: "azure-devops-service-connection" # Update to '{yourResourceManagerConnectionName}'
+  - name: AZURE_LOCATION
+    value: "japaneast" # Update to '{yourLocationName}'
+  - name: AZURE_SUBSCRIPTION_ID
+    value: "" # Update to '{yourAZURE_SUBSCRIPTION_ID}'
+
+stages:
+  - stage: Deploy_prod
+    displayName: "Deploy ARM templates to dev"
+    # condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
+    jobs:
+    - template: templates/jobs/arm-template-sub-deploy-job.yml
+      parameters:
+        ENVIRONMENT_NAME: 'prod'
+        TARGET_AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        TARGET_AZURE_LOCATION: $(AZURE_LOCATION)
+        PARAMETER_FILEPATH: ciartifacts/infra/params_prod.json
+        DEPLOY_FILEPATH: ciartifacts/infra/main.json
+        
