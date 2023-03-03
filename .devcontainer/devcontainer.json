@@ -23,7 +23,7 @@
 	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
 	"features": {
-		"git": "latest",
-		"azure-cli": "latest"
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/azure-cli:1": {}
 	}
 }
