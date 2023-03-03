@@ -2,7 +2,7 @@
 
 ## 1. サービスプリンシパルの作成
 
-1. [アプリの登録](https://docs.microsoft.com/ja-jp/power-bi/developer/embedded/embed-service-principal#step-1---create-an-azure-ad-app)を実施します。
+1. [アプリの登録](https://docs.microsoft.com/ja-jp/power-bi/developer/embedded/embed-service-principal#step-1---create-an-azure-ad-app)を実施します。※「手順 1 - Azure AD アプリを作成する」のみでOK
 2. 以下の情報をメモします。
 
 - アプリケーション (クライアント) ID 

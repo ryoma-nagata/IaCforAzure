@@ -7,7 +7,7 @@
 
 ![](.image/2022-09-05-10-05-09.png)
 
-2. を開き、 **Edit** をクリックします。
+2. infra/params_dev.jsonを開き、 **Edit** をクリックします。
 
 ![](.image/2022-09-05-10-06-31.png)
 
@@ -59,7 +59,7 @@
 
 ## 3. 開発環境デプロイパイラインの読み込みと実行
 
-1. 同様の手順で、**/.ado/workflows/arm-template-ci-dev.yml** を選択します。
+1. 同様の手順で、**/.ado/workflows/arm-template-rg-ci-dev.yml** を選択します。
 
 ![](.image/2022-09-05-10-21-02.png)
 
